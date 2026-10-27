@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>CORS POST Test</title>
+</head>
+<body>
+  <h2>CORS POST Test</h2>
+
+  <label for="target">Target URL:</label>
+  <input id="target" type="url" size="60"
+         placeholder="https://teams.events.data.microsoft.com/OneCollector/1.0/?cors=true&content-type=application/x-json-stream&content-encoding=gzip">
+
+  <button id="run">Send POST</button>
+  <pre id="result">Hasil akan muncul di sini.</pre>
+
+  <script>
+    document.getElementById("run").addEventListener("click", async () => {
+      const target = document.getElementById("target").value.trim();
+      const result = document.getElementById("result");
+
+      if (!target.startsWith("https://")) {
+        result.textContent = "Masukkan URL HTTPS yang valid.";
+        return;
+      }
+
+      result.textContent = "Mengirim POST...";
+
+      try {
+        const response = await fetch(target, {
+          method: "POST",
+          mode: "cors",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            cors_test: true
+          })
+        });
+
+        const body = await response.text();
+
+        result.textContent =
+          "HTTP Status: " + response.status +
+          "\nResponse body:\n" + body;
+      } catch (error) {
+        result.textContent =
+          "Request gagal atau response diblokir CORS.\n" +
+          "Periksa DevTools > Network dan Console.\n" +
+          error.message;
+      }
+    });
+  </script>
+</body>
+</html>
